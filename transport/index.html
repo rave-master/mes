@@ -72,13 +72,10 @@ function formatDate(value) {
     d = new Date(value);
   }
   if (isNaN(d)) return value;
-  return d.toLocaleString('en-US', { 
+  return d.toLocaleDateString('en-US', { 
     year: 'numeric', 
     month: 'short', 
-    day: '2-digit', 
-    hour: '2-digit', 
-    minute: '2-digit', 
-    hour12: true 
+    day: '2-digit'
   }).toUpperCase();
 }
 
@@ -97,7 +94,6 @@ fetch(DATA_URL)
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
     }))].sort();
 
-    // Auto-select the current month if available
     const now = new Date();
     const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}`;
     currentMonthIndex = monthList.indexOf(currentMonthStr);
@@ -134,41 +130,43 @@ function renderTableAndCharts() {
   let totalCu = 0, totalBd = 0, totalPieces = 0;
   let kindCounts = {}, speciesCounts = {}, dailyCounts = {};
 
-  allData.forEach(row => {
+  const filteredData = allData.filter(row => {
     const d = new Date(row[dateKey]);
-    const rowMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
-    if (rowMonth === month) {
-      const tr = document.createElement("tr");
-      headers.forEach(h => {
-        const key = h.trim().toLowerCase();
-        const td = document.createElement("td");
-        if (key.includes("photo")) {
-          const url = row[key];
-          if (url) {
-            const img = document.createElement("img");
-            img.src = convertDriveLink(url);
-            img.onclick = () => window.open(url, "_blank");
-            td.appendChild(img);
-          }
-        } else if (key.includes("timestamp") || key === "date" || key.includes("date/ time")) {
-          td.textContent = formatDate(row[key]);
-        } else {
-          td.textContent = row[key] || "";
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}` === month;
+  });
+
+  filteredData.forEach(row => {
+    const tr = document.createElement("tr");
+    headers.forEach(h => {
+      const key = h.trim().toLowerCase();
+      const td = document.createElement("td");
+      if (key.includes("photo")) {
+        const url = row[key];
+        if (url) {
+          const img = document.createElement("img");
+          img.src = convertDriveLink(url);
+          img.loading = "lazy";
+          img.onclick = () => window.open(url, "_blank");
+          td.appendChild(img);
         }
-        tr.appendChild(td);
-      });
-      tableBody.appendChild(tr);
+      } else if (key.includes("timestamp") || key === "date" || key.includes("date/ time")) {
+        td.textContent = formatDate(row[key]);
+      } else {
+        td.textContent = row[key] || "";
+      }
+      tr.appendChild(td);
+    });
+    tableBody.appendChild(tr);
 
-      totalCu += parseFloat(row[cuKey]) || 0;
-      totalBd += parseFloat(row[bdKey]) || 0;
-      totalPieces += parseInt(row[piecesKey]) || 0;
+    totalCu += parseFloat(row[cuKey]) || 0;
+    totalBd += parseFloat(row[bdKey]) || 0;
+    totalPieces += parseInt(row[piecesKey]) || 0;
 
-      kindCounts[row[kindKey]] = (kindCounts[row[kindKey]] || 0) + 1;
-      speciesCounts[row[speciesKey]] = (speciesCounts[row[speciesKey]] || 0) + 1;
+    kindCounts[row[kindKey]] = (kindCounts[row[kindKey]] || 0) + 1;
+    speciesCounts[row[speciesKey]] = (speciesCounts[row[speciesKey]] || 0) + 1;
 
-      const dayLabel = d.toLocaleDateString();
-      dailyCounts[dayLabel] = (dailyCounts[dayLabel] || 0) + 1;
-    }
+    const dayLabel = new Date(row[dateKey]).toLocaleDateString();
+    dailyCounts[dayLabel] = (dailyCounts[dayLabel] || 0) + 1;
   });
 
   const footerRow = document.createElement("tr");
@@ -211,7 +209,7 @@ function renderCharts(kindCounts, speciesCounts, dailyCounts) {
     type: "pie",
     data: {
       labels: Object.keys(speciesCounts),
-      datasets: [{ label: "Species", data: Object.values(speciesCounts), backgroundColor: ["#28a745","#ffc107","#17a2b8","#dc3545","#6f42c1"] }]
+      datasets: [{ label: "Species", data: Object.values(speciesCounts), backgroundColor: ["#28a745","#ffc107","#17a2b8","#dc3545","#6f42c1","#20c997","#fd7e14","#6610f2"] }]
     },
     options: { responsive: true, maintainAspectRatio: false }
   });
