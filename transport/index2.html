@@ -1,21 +1,23 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Monitoring Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   body { font-family: Arial, sans-serif; padding: 20px; background: #f8f9fa; }
   h1 { text-align: center; margin-bottom: 10px; }
   .search-box { margin-bottom: 10px; padding: 8px; width: 100%; max-width: 400px; border: 1px solid #ccc; border-radius: 4px; }
   .month-nav { text-align: center; margin: 15px 0; font-size: 18px; }
-  .month-nav button { padding: 6px 12px; margin: 0 10px; border: none; background: #007BFF; color: white; border-radius: 4px; cursor: pointer; }
-  .month-nav button:hover { background: #0056b3; }
+  .month-nav button, #downloadPDF { padding: 6px 12px; margin: 0 10px; border: none; background: #007BFF; color: white; border-radius: 4px; cursor: pointer; }
+  .month-nav button:hover, #downloadPDF:hover { background: #0056b3; }
   table { border-collapse: collapse; width: 100%; background: white; margin-top: 10px; }
   th, td { border: 1px solid #ddd; padding: 6px; text-align: left; vertical-align: middle; font-size: 14px; }
   th { background-color: #007BFF; color: white; }
   tr:nth-child(even) { background-color: #f2f2f2; }
-  img { max-width: 100px; max-height: 80px; cursor: pointer; border-radius: 4px; }
+  img { width: 144px; height: 240px; object-fit: cover; cursor: pointer; border-radius: 4px; } /* 3x5 inches at ~48px/inch */
   tfoot td { font-weight: bold; background: #e9ecef; }
   .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-top: 20px; }
   .chart-container { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 300px; display: flex; align-items: center; justify-content: center; }
@@ -32,6 +34,7 @@
   <button onclick="changeMonth(-1)">← Prev</button>
   <span id="monthLabel"></span>
   <button onclick="changeMonth(1)">Next →</button>
+  <button id="downloadPDF">Download PDF</button>
 </div>
 
 <table id="dataTable">
@@ -53,7 +56,6 @@ const DATA_URL = "https://script.google.com/macros/s/AKfycbyYReWmhvUY-ECqMaSEP2o
 let allData = [];
 let currentMonthIndex = 0;
 let monthList = [];
-
 let kindChart, speciesChart, timelineChart;
 
 function convertDriveLink(url) {
@@ -64,43 +66,20 @@ function convertDriveLink(url) {
   return url;
 }
 
-// Date only
 function formatDate(value) {
-  let d;
-  if (!isNaN(value) && value > 1000 && value < 60000) {
-    d = new Date((value - 25569) * 86400 * 1000);
-  } else {
-    d = new Date(value);
-  }
+  let d = new Date(value);
   if (isNaN(d)) return value;
-  return d.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: '2-digit'
-  }).toUpperCase();
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase();
 }
 
-// Date + Time
 function formatDateTime(value) {
-  let d;
-  if (!isNaN(value) && value > 1000 && value < 60000) {
-    d = new Date((value - 25569) * 86400 * 1000);
-  } else {
-    d = new Date(value);
-  }
+  let d = new Date(value);
   if (isNaN(d)) return value;
-  return d.toLocaleString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
-  }).toUpperCase();
+  return d.toLocaleString('en-US', { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase();
 }
 
-function formatNumber(value, decimals = 2) {
-  return Number(value).toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 fetch(DATA_URL)
@@ -131,8 +110,8 @@ function renderTableAndCharts() {
   const tableHeader = document.getElementById("tableHeader");
   const tableBody = document.getElementById("tableBody");
   const tableFooter = document.getElementById("tableFooter");
-  tableHeader.innerHTML = ""; 
-  tableBody.innerHTML = ""; 
+  tableHeader.innerHTML = "";
+  tableBody.innerHTML = "";
   tableFooter.innerHTML = "";
 
   headers.forEach(h => {
@@ -174,9 +153,9 @@ function renderTableAndCharts() {
           td.appendChild(img);
         }
       } else if (key.includes("timestamp")) {
-        td.textContent = formatDateTime(row[key]); // Date + Time
-      } else if (key.includes("date issued") || key.includes("expiry date") || key === "date" || key.includes("date/ time")) {
-        td.textContent = formatDate(row[key]); // Date only
+        td.textContent = formatDateTime(row[key]);
+      } else if (key === "date issued" || key === "expiry date" || key === "date") {
+        td.textContent = formatDate(row[key]);
       } else {
         td.textContent = row[key] || "";
       }
@@ -200,11 +179,11 @@ function renderTableAndCharts() {
     const key = h.toLowerCase();
     const td = document.createElement("td");
     if (key.includes("cu.m")) {
-      td.textContent = formatNumber(totalCu) + " CU.M.";
+      td.textContent = numberWithCommas(totalCu.toFixed(2)) + " CU.M.";
     } else if (key.includes("bd.ft")) {
-      td.textContent = formatNumber(totalBd) + " BD.FT";
+      td.textContent = numberWithCommas(totalBd.toFixed(2)) + " BD.FT";
     } else if (key.includes("pieces")) {
-      td.textContent = formatNumber(totalPieces, 0) + " PIECES";
+      td.textContent = numberWithCommas(totalPieces) + " PIECES";
     } else if (headers.indexOf(h) === 0) {
       td.textContent = "TOTAL:";
     } else {
@@ -270,6 +249,23 @@ function filterTable() {
     row.style.display = cells.some(cell => cell.textContent.toLowerCase().includes(searchValue)) ? "" : "none";
   });
 }
+
+// PDF Export
+document.getElementById("downloadPDF").addEventListener("click", function () {
+  const { jsPDF } = window.jspdf;
+  const tableElement = document.getElementById("dataTable");
+
+  html2canvas(tableElement, { scale: 2, useCORS: true }).then(canvas => {
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("l", "pt", "a4");
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const imgWidth = pageWidth - 40;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 20, 20, imgWidth, imgHeight);
+    pdf.save("Forest_Report.pdf");
+  });
+});
 </script>
 
 </body>
