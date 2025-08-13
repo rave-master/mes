@@ -198,63 +198,35 @@ function addLocationsToMap(data) {
     // Use the capital-L "Location" column as you specified
     const loc = (row["location"] !== undefined) ? row["location"] : row["Location"];
     if (!loc) return;
+
     const species = row["species"] || row["Species"] || "";
-    const popupHtml = `<div style="font-weight:600">${escapeHtml(species || "Record")}</div><div style="font-size:90%">${escapeHtml(String(loc))}</div>`;
-    // If lat,lng pattern:
-    const latlngMatch = String(loc).trim().match(/^(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)$/);
-    if (latlngMatch) {
-      const lat = Number(latlngMatch[1]);
-      const lng = Number(latlngMatch[3]);
-      const m = L.marker([lat, lng]).bindPopup(popupHtml);
-      markerClusterGroup.addLayer(m);
-      bounds.push([lat, lng]);
-    } else {
-      // geocode with caching
-      const key = String(loc).trim();
-      if (geocodeCache[key]) {
-        const { lat, lon } = geocodeCache[key];
-        const m = L.marker([lat, lon]).bindPopup(popupHtml);
+    const popupHtml = `<div style="font-weight:600">${escapeHtml(species || "Record")}</div>
+                       <div style="font-size:90%">${escapeHtml(String(loc))}</div>`;
+
+    // Split and only take first two as lat/lng
+    const parts = String(loc).split(",");
+    if (parts.length >= 2) {
+      const lat = parseFloat(parts[0]);
+      const lng = parseFloat(parts[1]);
+
+      if (!isNaN(lat) && !isNaN(lng)) {
+        const m = L.marker([lat, lng]).bindPopup(popupHtml);
         markerClusterGroup.addLayer(m);
-        bounds.push([lat, lon]);
-      } else {
-        tasks.push({loc:key, popupHtml});
+        bounds.push([lat, lng]);
       }
     }
   });
 
-  // sequential geocode tasks with delay
-  (async function runGeocodeTasks() {
-    for (let i = 0; i < tasks.length; i++) {
-      const t = tasks[i];
-      try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(t.loc)}`, {
-          headers: { 'Accept-Language': 'en' }
-        });
-        const arr = await res.json();
-        if (arr && arr.length) {
-          const { lat, lon } = arr[0];
-          geocodeCache[t.loc] = { lat, lon };
-          const m = L.marker([Number(lat), Number(lon)]).bindPopup(t.popupHtml);
-          markerClusterGroup.addLayer(m);
-          bounds.push([Number(lat), Number(lon)]);
-        }
-      } catch (e) {
-        console.warn("Geocode failed for", t.loc, e);
-      }
-      // Delay between requests to be polite / avoid rate limiting
-      await new Promise(r => setTimeout(r, NOMINATIM_DELAY_MS));
+  // Fit map to bounds if any markers exist
+  if (bounds.length) {
+    try {
+      map.fitBounds(bounds, { padding: [40, 40] });
+    } catch (e) {
+      console.warn(e);
     }
-
-    // Fit map to bounds if any
-    if (bounds.length) {
-      try {
-        map.fitBounds(bounds, { padding: [40,40] });
-      } catch (e) { console.warn(e); }
-    } else {
-      // no markers -> set default view
-      map.setView([12.8797, 121.7740], 9);
-    }
-  })();
+  } else {
+    map.setView([12.8797, 121.7740], 9);
+  }
 }
 
 
@@ -440,6 +412,7 @@ function filterTable() {
   });
 }
 
+
 /* --------------------------- PDF HELPERS --------------------------- */
 // convert external image URL to dataURL for jsPDF embedding
 async function urlToDataURL(url) {
@@ -488,21 +461,21 @@ async function generatePDF() {
   const doc = new jsPDF({ unit: 'in', format: 'legal' });
 
   doc.setFontSize(14);
-  doc.text(`Forest Products Transport Report - ${formatMonthLabel(month).toUpperCase()}`, 1.9, 0.6);
+  doc.text(`Forest Products Transport Report - ${formatMonthLabel(month).toUpperCase()}`, 1.5, 0.6);
   doc.setFontSize(10);
-  doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, 0.9, 0.9);
-  doc.text(`Records included: ${filteredData.length}`, 0.9, 1.2);
+  doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, 0.5, 0.9);
+  doc.text(`Records included: ${filteredData.length}`, 0.5, 1.2);
 
   let pageIndex = 0;
   for (const record of filteredData) {
     if (pageIndex > 0 || doc.getNumberOfPages() > 1) doc.addPage();
     doc.setFontSize(11);
-    doc.text(`Record #${pageIndex + 1}`, 0.9, 0.6);
+    doc.text(`Record #${pageIndex + 1}`, 0.5, 0.6);
     doc.setFontSize(9);
 
-    let y = 1.9;
-    const leftX = 0.9;
-    const rightX = 9.0;
+    let y = 1.5;
+    const leftX = 0.5;
+    const rightX = 5.0;
 
     for (const k of headers) {
       const key = k.trim().toLowerCase();
@@ -513,7 +486,7 @@ async function generatePDF() {
       else if (key.includes("date issued") || key.includes("expiry date")) displayValue = formatDate(displayValue);
       else if (key === "date" || key.includes("date/ time")) displayValue = formatDate(displayValue);
 
-      if (y > 10.9) {
+      if (y > 10.5) {
         doc.addPage();
         y = 0.6;
       }
@@ -529,13 +502,13 @@ async function generatePDF() {
         const imageUrl = convertDriveLink(originalUrl);
         try {
           const dataUrl = await urlToDataURL(imageUrl);
-          doc.addImage(dataUrl, 'JPEG', rightX, photoY, 3.0, 9.0);
+          doc.addImage(dataUrl, 'JPEG', rightX, photoY, 3.0, 5.0);
         } catch (err) {
           console.warn("Image embed failed for", imageUrl, err);
           doc.setFontSize(9);
           doc.text(`(Image failed to load: ${imageUrl})`, rightX, photoY + 0.2);
         }
-        photoY += 9.2;
+        photoY += 5.2;
       }
     } else {
       doc.setFontSize(9);
@@ -547,6 +520,8 @@ async function generatePDF() {
 
   doc.save(`Report_${formatMonthLabel(month).replace(/\s+/g,'_')}.pdf`);
 }
+
+
 
 /* --------------------------- DATA LOADING --------------------------- */
 fetch(DATA_URL)
