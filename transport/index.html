@@ -34,8 +34,6 @@
   .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-top: 20px; }
   .chart-container { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 300px; display: flex; align-items: center; justify-content: center; }
   .chart-container canvas { max-width: 100%; max-height: 100%; }
-  .map-container { background: white; padding: 0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 300px; }
-  #map { width: 100%; height: 100%; border-radius: 8px; }
   .right-align { text-align: right; }
   .no-data { text-align: center; margin-top: 20px; color: #666; }
 </style>
@@ -99,7 +97,7 @@
   line-height: 1.2; /* Increased for better readability */
   text-align: center;
   margin-bottom: 2rem;
-  margin-top: 10rem; /* Increased top space */
+  margin-top: 5rem; /* Increased top space */
 }
 
 
@@ -110,8 +108,46 @@
   <div class="chart-container"><canvas id="chartSpecies"></canvas></div>
   <div class="chart-container"><canvas id="chartTimeline"></canvas></div>
   <div class="chart-container"><canvas id="chartCenroOrigin"></canvas></div>
-  <div class="map-container"><div id="map"></div></div>
+  
+  <style>
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  .map-container {
+    position: relative; /* allow absolute positioning inside */
+    width: 80vw;
+    height: 400px;
+    margin: 2rem auto; /* center the container horizontally */
+    padding-left: 10%;
+  }
+  .map-title {
+    position: absolute;
+    top: 5px; /* distance from top of the map */
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #df0606;
+    background: rgba(255, 255, 255, 0.8); /* semi-transparent background for readability */
+    padding: 5px 10px;
+    border-radius: 6px;
+    z-index: 1000; /* make sure it’s above the map */
+    text-align: center;
+  }
+  #map {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<div class="map-container">
+  <h3 class="map-title">Locator Map and Clusters<br>Kilometer 48</h3>
+
+  <div id="map"></div>
 </div>
+
 
 
 <script>
@@ -199,9 +235,10 @@ function addLocationsToMap(data) {
     const loc = (row["location"] !== undefined) ? row["location"] : row["Location"];
     if (!loc) return;
 
+    const permittee = row["permittee"] || row["Permittee"] || "";
     const species = row["species"] || row["Species"] || "";
-    const popupHtml = `<div style="font-weight:600">${escapeHtml(species || "Record")}</div>
-                       <div style="font-size:90%">${escapeHtml(String(loc))}</div>`;
+    const popupHtml = `<div style="font-weight:600">${escapeHtml(permittee || "Record")}</div>
+                       <div style="font-size:90%">${escapeHtml(species || "Record")}</div>`;
 
     // Split and only take first two as lat/lng
     const parts = String(loc).split(",");
@@ -361,31 +398,110 @@ function renderCharts(kindCounts, speciesCounts, dailyCounts, cenroOriginCounts)
   if (cenroOriginChart) cenroOriginChart.destroy();
 
   const kindData = sortedLabelValueArrays(kindCounts);
-  kindChart = new Chart(document.getElementById("chartKind"), {
-    type: "bar",
-    data: { labels: kindData.labels, datasets: [{ label: "Kind", data: kindData.values, backgroundColor: "#007BFF" }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-  });
+
+kindChart = new Chart(document.getElementById("chartKind"), {
+  type: "bar",
+  data: {
+    labels: kindData.labels,
+    datasets: [{
+      label: "Kind", // This will show in the legend
+      data: kindData.values,
+      backgroundColor: "#007BFF"
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true, // Show dataset label in legend
+        position: 'top'
+      },
+      title: {
+        display: true, // Show chart title
+        text: 'Products Kind Distribution',
+        font: {
+          size: 18
+        }
+      }
+    }
+  }
+});
+
 
   const speciesData = sortedLabelValueArrays(speciesCounts);
   speciesChart = new Chart(document.getElementById("chartSpecies"), {
     type: "pie",
-    data: { labels: speciesData.labels, datasets: [{ label: "Species", data: speciesData.values, backgroundColor: ["#28a745","#ffc107","#17a2b8","#dc3545","#6f42c1","#20c997","#fd7e14","#6610f2"] }] },
-    options: { responsive: true, maintainAspectRatio: false }
+    data: { labels: speciesData.labels, datasets: [{ label: "Species", data: speciesData.values,
+     backgroundColor: ["#28a745","#ffc107","#17a2b8","#dc3545","#6f42c1","#20c997","#fd7e14","#6610f2"] }] },
+    
+     options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true, // Show dataset label in legend
+        position: 'top'
+      },
+      title: {
+        display: true, // Show chart title
+        text: 'Species Distribution',
+        font: {
+          size: 18
+        }
+      }
+    }
+  }
   });
 
   const timelineData = sortedLabelValueArrays(dailyCounts);
   timelineChart = new Chart(document.getElementById("chartTimeline"), {
     type: "line",
-    data: { labels: timelineData.labels, datasets: [{ label: "Daily Trend", data: timelineData.values, fill: false, borderColor: "#17a2b8", tension: 0.2 }] },
-    options: { responsive: true, maintainAspectRatio: false }
+    data: { labels: timelineData.labels, datasets: [{ label: "Daily Trend", data: timelineData.values, fill: false,
+     borderColor: "#17a2b8", tension: 0.2 }] },
+
+    options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true, // Show dataset label in legend
+        position: 'top'
+      },
+      title: {
+        display: true, // Show chart title
+        text: 'Transport Trend Over Time',
+        font: {
+          size: 18
+        }
+      }
+    }
+  }
   });
 
   const cenroData = sortedLabelValueArrays(cenroOriginCounts);
   cenroOriginChart = new Chart(document.getElementById("chartCenroOrigin"), {
     type: "bar",
-    data: { labels: cenroData.labels, datasets: [{ label: "CENRO-ORIGIN Count", data: cenroData.values, backgroundColor: "#ff5733" }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    data: { labels: cenroData.labels, datasets: [{ label: "CENRO-ORIGIN Count", data: cenroData.values, 
+    backgroundColor: ["#28a745","#ffc107","#17a2b8","#dc3545","#6f42c1","#20c997","#fd7e14","#6610f2"] }] },
+    
+    options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true, // Show dataset label in legend
+        position: 'top'
+      },
+      title: {
+        display: true, // Show chart title
+        text: 'Most Common CENRO Origin',
+        font: {
+          size: 18
+        }
+      }
+    }
+  }
   });
 }
 
