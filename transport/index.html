@@ -7,7 +7,7 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.9.1/jspdf.umd.min.js"></script>
 <!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -42,7 +42,24 @@
 </head>
 <body>
 
-<h1>Forest Products Transport<br>Monitoring Dashboard<br> -Km.48-</h1>
+<h1 class="dashboard-title">
+  Forest Products Transport<br>
+  Monitoring Dashboard <br>- Km 48 -
+</h1>
+
+<style>
+  .dashboard-title {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Clean & modern font */
+    font-size: 4rem; /* Large enough to stand out */
+    font-weight: 700; /* Bold for emphasis */
+    color: #2E3A59; /* Dark, professional color */
+    line-height: .9; /* Balanced spacing between lines */
+    text-align: center; /* Center for symmetry */
+    margin-bottom: 2rem;
+  }
+
+</style>
+
 
 <div class="controls">
   <div class="left-controls">
@@ -68,6 +85,26 @@
 
 <div id="noDataMessage" class="no-data" style="display:none;">No records for selected month.</div>
 
+<h2 class="board-title">
+  Visualization and Analytics<br>
+  Monitoring Dashboard Km 48 
+</h2>
+
+<style>
+  .board-title {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2E3A59;
+  line-height: 1.2; /* Increased for better readability */
+  text-align: center;
+  margin-bottom: 2rem;
+  margin-top: 10rem; /* Increased top space */
+}
+
+
+</style>
+
 <div class="charts">
   <div class="chart-container"><canvas id="chartKind"></canvas></div>
   <div class="chart-container"><canvas id="chartSpecies"></canvas></div>
@@ -75,6 +112,7 @@
   <div class="chart-container"><canvas id="chartCenroOrigin"></canvas></div>
   <div class="map-container"><div id="map"></div></div>
 </div>
+
 
 <script>
 /* ------------------------------ CONFIG ------------------------------ */
@@ -143,7 +181,7 @@ function sortedLabelValueArrays(countObj) {
 /* --------------------------- MAP FUNCTIONS ------------------------- */
 function initMap() {
   // Philippines center by default
-  map = L.map('map', {zoomControl: true}).setView([12.8797, 121.7740], 5);
+  map = L.map('map', {zoomControl: true}).setView([12.8797, 121.7740], 9);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
@@ -214,10 +252,11 @@ function addLocationsToMap(data) {
       } catch (e) { console.warn(e); }
     } else {
       // no markers -> set default view
-      map.setView([12.8797, 121.7740], 5);
+      map.setView([12.8797, 121.7740], 9);
     }
   })();
 }
+
 
 /* --------------------------- DOM / RENDER -------------------------- */
 function renderTableAndCharts() {
@@ -449,21 +488,21 @@ async function generatePDF() {
   const doc = new jsPDF({ unit: 'in', format: 'legal' });
 
   doc.setFontSize(14);
-  doc.text(`Forest Products Transport Report - ${formatMonthLabel(month).toUpperCase()}`, 1.5, 0.6);
+  doc.text(`Forest Products Transport Report - ${formatMonthLabel(month).toUpperCase()}`, 1.9, 0.6);
   doc.setFontSize(10);
-  doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, 0.5, 0.9);
-  doc.text(`Records included: ${filteredData.length}`, 0.5, 1.2);
+  doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, 0.9, 0.9);
+  doc.text(`Records included: ${filteredData.length}`, 0.9, 1.2);
 
   let pageIndex = 0;
   for (const record of filteredData) {
     if (pageIndex > 0 || doc.getNumberOfPages() > 1) doc.addPage();
     doc.setFontSize(11);
-    doc.text(`Record #${pageIndex + 1}`, 0.5, 0.6);
+    doc.text(`Record #${pageIndex + 1}`, 0.9, 0.6);
     doc.setFontSize(9);
 
-    let y = 1.5;
-    const leftX = 0.5;
-    const rightX = 5.0;
+    let y = 1.9;
+    const leftX = 0.9;
+    const rightX = 9.0;
 
     for (const k of headers) {
       const key = k.trim().toLowerCase();
@@ -474,7 +513,7 @@ async function generatePDF() {
       else if (key.includes("date issued") || key.includes("expiry date")) displayValue = formatDate(displayValue);
       else if (key === "date" || key.includes("date/ time")) displayValue = formatDate(displayValue);
 
-      if (y > 10.5) {
+      if (y > 10.9) {
         doc.addPage();
         y = 0.6;
       }
@@ -490,13 +529,13 @@ async function generatePDF() {
         const imageUrl = convertDriveLink(originalUrl);
         try {
           const dataUrl = await urlToDataURL(imageUrl);
-          doc.addImage(dataUrl, 'JPEG', rightX, photoY, 3.0, 5.0);
+          doc.addImage(dataUrl, 'JPEG', rightX, photoY, 3.0, 9.0);
         } catch (err) {
           console.warn("Image embed failed for", imageUrl, err);
           doc.setFontSize(9);
           doc.text(`(Image failed to load: ${imageUrl})`, rightX, photoY + 0.2);
         }
-        photoY += 5.2;
+        photoY += 9.2;
       }
     } else {
       doc.setFontSize(9);
@@ -561,6 +600,7 @@ document.onkeydown = function(e) {
     return false;
   }
 };
+
 </script>
 
 </body>
