@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lumber Dealer Permit Dashboard - CNC</title>
+  <title>Lumber Dealer Permit Dashboard v13 - CNC</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
     body {
+      box-sizing: border-box;
       font-family: 'Inter', sans-serif;
     }
     
@@ -99,25 +100,37 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    
+    .version-badge {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-green-50 min-h-screen">
+<body class="bg-gradient-to-br from-slate-50 to-amber-50 min-h-screen">
   <!-- Header -->
   <header class="bg-white shadow-sm border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center py-4">
         <div class="flex items-center space-x-4">
-          <div class="w-10 h-10 bg-gradient-to-r from-green-600 to-emerald-700 rounded-lg flex items-center justify-center">
-            <i class="fas fa-tree text-white text-lg"></i>
+          <div class="w-10 h-10 bg-gradient-to-r from-amber-600 to-orange-700 rounded-lg flex items-center justify-center">
+            <i class="fas fa-industry text-white text-lg"></i>
           </div>
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">Lumber Dealer Permit Dashboard</h1>
+            <div class="flex items-center space-x-3">
+              <h1 class="text-2xl font-bold text-gray-900">Lumber Dealer Permit Dashboard</h1>
+              <span class="version-badge">v13</span>
+            </div>
             <p class="text-sm text-gray-600">CENRO New Corella Management System</p>
           </div>
         </div>
         <div class="flex items-center space-x-4">
           <div class="text-right">
-            <p class="text-sm text-gray-600">Last Updated</p>
+            <p class="text-sm text-gray-600">Philippine Standard Time</p>
             <p class="text-sm font-semibold text-gray-900" id="lastUpdated"></p>
           </div>
           <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
@@ -135,15 +148,15 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">Total Permits</p>
-            <p class="text-3xl font-bold text-gray-900" id="totalLicenses">5</p>
+            <p class="text-3xl font-bold text-gray-900" id="totalLicenses">0</p>
           </div>
-          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-            <i class="fas fa-certificate text-green-600 text-xl"></i>
+          <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+            <i class="fas fa-certificate text-amber-600 text-xl"></i>
           </div>
         </div>
         <div class="mt-4">
-          <span class="text-sm text-green-600 font-medium" id="totalLicensesChange">
-            <i class="fas fa-arrow-up"></i> 60% Active
+          <span class="text-sm text-amber-600 font-medium" id="totalLicensesChange">
+            <i class="fas fa-sync-alt fa-spin"></i> Loading...
           </span>
         </div>
       </div>
@@ -152,7 +165,7 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">Active Permits</p>
-            <p class="text-3xl font-bold text-green-600" id="activeLicenses">3</p>
+            <p class="text-3xl font-bold text-green-600" id="activeLicenses">0</p>
           </div>
           <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
             <i class="fas fa-check-circle text-green-600 text-xl"></i>
@@ -167,7 +180,7 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">Expiring Soon</p>
-            <p class="text-3xl font-bold text-yellow-600" id="expiringSoon">1</p>
+            <p class="text-3xl font-bold text-yellow-600" id="expiringSoon">0</p>
           </div>
           <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
             <i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
@@ -182,7 +195,7 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">Expired</p>
-            <p class="text-3xl font-bold text-red-600" id="expiredLicenses">1</p>
+            <p class="text-3xl font-bold text-red-600" id="expiredLicenses">0</p>
           </div>
           <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
             <i class="fas fa-times-circle text-red-600 text-xl"></i>
@@ -197,7 +210,7 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">Establishments</p>
-            <p class="text-3xl font-bold text-blue-600" id="totalHolders">5</p>
+            <p class="text-3xl font-bold text-blue-600" id="totalHolders">0</p>
           </div>
           <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
             <i class="fas fa-users text-blue-600 text-xl"></i>
@@ -226,11 +239,14 @@
             <i class="fas fa-times mr-2"></i>Expired
           </button>
           <button class="filter-btn px-4 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium hover:bg-gray-700" onclick="exportData()">
-            <i class="fas fa-download mr-2"></i>Export
+            <i class="fas fa-download mr-2"></i>Export CSV
+          </button>
+          <button class="filter-btn px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700" onclick="refreshData()">
+            <i class="fas fa-sync-alt mr-2"></i>Refresh
           </button>
         </div>
         <div class="relative">
-          <input type="text" id="searchInput" placeholder="Search permits..." 
+          <input type="text" id="searchInput" placeholder="Search lumber dealer permits..." 
                  class="search-box pl-10 pr-4 py-2 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none w-full lg:w-80">
           <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
         </div>
@@ -240,11 +256,19 @@
     <!-- Data Table -->
     <div class="table-container animate-fade-in">
       <div class="px-6 py-4 border-b border-gray-200">
-        <h3 class="text-lg font-semibold text-gray-900">
-          <i class="fas fa-table mr-2 text-green-600"></i>
-          Lumber Dealer Permit Registry
-        </h3>
-        <p class="text-sm text-gray-600 mt-1">Complete list of lumber dealer permits and establishments</p>
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">
+              <i class="fas fa-table mr-2 text-amber-600"></i>
+              Lumber Dealer Permit Registry
+            </h3>
+            <p class="text-sm text-gray-600 mt-1">Complete list of lumber dealer permits and establishments</p>
+          </div>
+          <div class="text-sm text-gray-500" id="dataStatus">
+            <i class="fas fa-database mr-1"></i>
+            Connected to Google Sheets
+          </div>
+        </div>
       </div>
       
       <div class="overflow-x-auto" id="tableContainer">
@@ -252,10 +276,10 @@
           <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <i class="fas fa-building mr-2"></i>Establishment
+                <i class="fas fa-industry mr-2"></i>Establishment
               </th>
               <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <i class="fas fa-map-marker-alt mr-2"></i>Location/Address
+                <i class="fas fa-map-marker-alt mr-2"></i>Location/ Address
               </th>
               <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <i class="fas fa-hashtag mr-2"></i>Permit Number
@@ -267,10 +291,13 @@
                 <i class="fas fa-calendar-times mr-2"></i>Expiry Date
               </th>
               <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <i class="fas fa-user-tie mr-2"></i>Owner/Representative
+                <i class="fas fa-user-tie mr-2"></i>Owner/ Representative
               </th>
               <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <i class="fas fa-user-check mr-2"></i>Data Provider
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <i class="fas fa-clock mr-2"></i>Time Until Expiry
               </th>
               <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <i class="fas fa-info-circle mr-2"></i>Status
@@ -278,129 +305,10 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" id="tableBody">
-            <tr class="data-row" data-status="active">
-              <td class="px-6 py-4">
-                <div class="flex items-center">
-                  <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                    <i class="fas fa-building text-green-600"></i>
-                  </div>
-                  <div>
-                    <div class="text-sm font-medium text-gray-900">Mylane Mini-Sawmill and Lumber Dealer</div>
-                    <div class="text-sm text-gray-500">Lumber Dealer</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-900">Mesaoy, New Corella, Davao del Norte</td>
-              <td class="px-6 py-4 text-sm font-mono text-gray-900">DENRXI-2A-LD56-R-05032029</td>
-              <td class="px-6 py-4 text-sm text-gray-900"></td>
-              <td class="px-6 py-4 text-sm text-gray-900">May 3, 2029</td>
-              <td class="px-6 py-4 text-sm text-gray-900">Liting Hou Qiu</td>
-              <td class="px-6 py-4 text-sm text-gray-900">Carmalyn C. Nesperos / RPS-LPU</td>
-              <td class="px-6 py-4">
-                <span class="status-active inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white">
-                  <i class="fas fa-check-circle mr-1"></i>
-                  Active
-                </span>
-              </td>
-            </tr>
-            <tr class="data-row" data-status="expiring-soon">
-              <td class="px-6 py-4">
-                <div class="flex items-center">
-                  <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                    <i class="fas fa-building text-green-600"></i>
-                  </div>
-                  <div>
-                    <div class="text-sm font-medium text-gray-900">New Corella Lumber Supply</div>
-                    <div class="text-sm text-gray-500">Lumber Dealer</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-900">Poblacion, New Corella, Davao del Norte</td>
-              <td class="px-6 py-4 text-sm font-mono text-gray-900">DENRXI-2A-LD57-R-06152028</td>
-              <td class="px-6 py-4 text-sm text-gray-900">June 15, 2023</td>
-              <td class="px-6 py-4 text-sm text-gray-900">June 15, 2025</td>
-              <td class="px-6 py-4 text-sm text-gray-900">Maria Santos</td>
-              <td class="px-6 py-4 text-sm text-gray-900">Carmalyn C. Nesperos / RPS-LPU</td>
-              <td class="px-6 py-4">
-                <span class="status-expiring inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white">
-                  <i class="fas fa-clock mr-1"></i>
-                  Expiring Soon
-                </span>
-              </td>
-            </tr>
-            <tr class="data-row" data-status="active">
-              <td class="px-6 py-4">
-                <div class="flex items-center">
-                  <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                    <i class="fas fa-building text-green-600"></i>
-                  </div>
-                  <div>
-                    <div class="text-sm font-medium text-gray-900">Davao Forest Products</div>
-                    <div class="text-sm text-gray-500">Lumber Dealer</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-900">San Roque, New Corella, Davao del Norte</td>
-              <td class="px-6 py-4 text-sm font-mono text-gray-900">DENRXI-2A-LD58-R-12012027</td>
-              <td class="px-6 py-4 text-sm text-gray-900">December 1, 2022</td>
-              <td class="px-6 py-4 text-sm text-gray-900">December 1, 2027</td>
-              <td class="px-6 py-4 text-sm text-gray-900">Juan dela Cruz</td>
-              <td class="px-6 py-4 text-sm text-gray-900">Carmalyn C. Nesperos / RPS-LPU</td>
-              <td class="px-6 py-4">
-                <span class="status-active inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white">
-                  <i class="fas fa-check-circle mr-1"></i>
-                  Active
-                </span>
-              </td>
-            </tr>
-            <tr class="data-row" data-status="active">
-              <td class="px-6 py-4">
-                <div class="flex items-center">
-                  <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                    <i class="fas fa-building text-green-600"></i>
-                  </div>
-                  <div>
-                    <div class="text-sm font-medium text-gray-900">Mountain View Lumber</div>
-                    <div class="text-sm text-gray-500">Lumber Dealer</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-900">Cabcab, New Corella, Davao del Norte</td>
-              <td class="px-6 py-4 text-sm font-mono text-gray-900">DENRXI-2A-LD59-R-03202030</td>
-              <td class="px-6 py-4 text-sm text-gray-900">March 20, 2025</td>
-              <td class="px-6 py-4 text-sm text-gray-900">March 20, 2030</td>
-              <td class="px-6 py-4 text-sm text-gray-900">Roberto Garcia</td>
-              <td class="px-6 py-4 text-sm text-gray-900">Carmalyn C. Nesperos / RPS-LPU</td>
-              <td class="px-6 py-4">
-                <span class="status-active inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white">
-                  <i class="fas fa-check-circle mr-1"></i>
-                  Active
-                </span>
-              </td>
-            </tr>
-            <tr class="data-row" data-status="expired">
-              <td class="px-6 py-4">
-                <div class="flex items-center">
-                  <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                    <i class="fas fa-building text-green-600"></i>
-                  </div>
-                  <div>
-                    <div class="text-sm font-medium text-gray-900">Golden Timber Trading</div>
-                    <div class="text-sm text-gray-500">Lumber Dealer</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-900">San Isidro, New Corella, Davao del Norte</td>
-              <td class="px-6 py-4 text-sm font-mono text-gray-900">DENRXI-2A-LD60-R-08102023</td>
-              <td class="px-6 py-4 text-sm text-gray-900">August 10, 2018</td>
-              <td class="px-6 py-4 text-sm text-gray-900">August 10, 2023</td>
-              <td class="px-6 py-4 text-sm text-gray-900">Ana Reyes</td>
-              <td class="px-6 py-4 text-sm text-gray-900">Carmalyn C. Nesperos / RPS-LPU</td>
-              <td class="px-6 py-4">
-                <span class="status-expired inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white">
-                  <i class="fas fa-times-circle mr-1"></i>
-                  Expired
-                </span>
+            <tr>
+              <td colspan="9" class="px-6 py-12 text-center">
+                <div class="loading-spinner mx-auto mb-4"></div>
+                <p class="text-gray-500">Loading permit data from Google Sheets...</p>
               </td>
             </tr>
           </tbody>
@@ -410,36 +318,62 @@
 
     <!-- Footer -->
     <div class="mt-8 text-center text-sm text-gray-600">
-      <p>Data provided by Carmalyn C. Nesperos / RPS-LPU • CENRO New Corella</p>
-      <p class="mt-2">© 2024 Lumber Dealer Permit Management System</p>
+      <p>Data provided by CENRO New Corella</p>
+      <p class="mt-2">© 2025 Lumber Dealer Permit Management System • Version 13</p>
     </div>
   </div>
 
   <script>
     let allData = [];
     let currentFilter = 'all';
+    let isLoading = false;
 
     // Initialize dashboard
     document.addEventListener('DOMContentLoaded', function() {
       updateLastUpdated();
       initializeSearch();
       loadDataFromGoogleSheets();
+      
+      // Update countdown timers and timestamp every second
+      setInterval(() => {
+        updateCountdownTimers();
+        updateLastUpdated();
+      }, 1000);
     });
 
     function updateLastUpdated() {
       const now = new Date();
-      const formatted = now.toLocaleDateString('en-US', {
+      const formatted = now.toLocaleDateString('en-PH', {
+        timeZone: 'Asia/Manila',
         month: 'short',
         day: 'numeric',
         year: 'numeric',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
       });
       document.getElementById('lastUpdated').textContent = formatted;
     }
 
+    function updateCountdownTimers() {
+      const countdownCells = document.querySelectorAll('.countdown-cell');
+      countdownCells.forEach(cell => {
+        const expiryDate = cell.getAttribute('data-expiry');
+        if (expiryDate) {
+          cell.innerHTML = getCountdownTimer(expiryDate);
+        }
+      });
+    }
+
     async function loadDataFromGoogleSheets() {
+      if (isLoading) return;
+      isLoading = true;
+      
       try {
+        updateDataStatus('Loading data...', 'text-yellow-600');
+        
+        // WPP Google Sheets URL
         const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSwGBYZbKiE-Z_YNKnYz59B7uS_nmxFJd85mRrPFK03W_B0HOADgr2D5q7mT8Kt17-xFhrIiSk8eq0H/pub?gid=695880952&single=true&output=csv', {
           method: 'GET',
           headers: {
@@ -457,9 +391,12 @@
         // Parse CSV
         const lines = csvText.split('\n').filter(line => line.trim());
         console.log('Number of lines:', lines.length);
+        console.log('Raw CSV text:', csvText);
         
         if (lines.length < 2) {
-          throw new Error('No data found in the spreadsheet');
+          console.log('Not enough lines, using sample data');
+          loadSampleData();
+          return;
         }
         
         const headers = parseCSVLine(lines[0]);
@@ -468,8 +405,10 @@
         allData = [];
         for (let i = 1; i < lines.length; i++) {
           const values = parseCSVLine(lines[i]);
+          console.log(`Row ${i}:`, values);
           
           if (values.length >= 1 && values[0] && values[0].trim()) {
+            // Map the actual CSV columns to our data structure
             allData.push({
               establishment: values[0] || '',
               location: values[1] || '',
@@ -477,7 +416,7 @@
               dateApproved: values[3] || '',
               expiryDate: values[4] || '',
               owner: values[5] || '',
-              dataProvider: values[6] || ''
+              dataProvider: values[6] || values[7] || 'Carmalyn C. Nesperos / RPS-LPU'
             });
           }
         }
@@ -487,14 +426,124 @@
         if (allData.length > 0) {
           populateTable();
           calculateStats();
+          updateDataStatus(`${allData.length} permits loaded`, 'text-green-600');
         } else {
-          console.log('No valid data found, keeping sample data');
+          console.log('No data from sheets, using sample data');
+          loadSampleData();
         }
         
       } catch (error) {
         console.error('Error loading data from Google Sheets:', error);
-        console.log('Using sample data as fallback');
+        updateDataStatus('Using sample data', 'text-yellow-600');
+        loadSampleData();
+      } finally {
+        isLoading = false;
+        updateLastUpdated();
       }
+    }
+
+    function loadSampleData() {
+      allData = [
+        {
+          establishment: 'Davao Lumber Trading Co.',
+          location: 'San Roque, New Corella, Davao del Norte',
+          permitNumber: 'DENRXI-2A-LD01-R-03152029',
+          dateApproved: 'March 15, 2024',
+          expiryDate: 'March 15, 2029',
+          owner: 'Roberto Martinez',
+          dataProvider: 'Carmalyn C. Nesperos / RPS-LPU'
+        },
+        {
+          establishment: 'New Corella Lumber Supply',
+          location: 'Poblacion, New Corella, Davao del Norte',
+          permitNumber: 'DENRXI-2A-LD02-R-07202028',
+          dateApproved: 'July 20, 2023',
+          expiryDate: 'July 20, 2028',
+          owner: 'Maria Santos',
+          dataProvider: 'Carmalyn C. Nesperos / RPS-LPU'
+        },
+        {
+          establishment: 'Mountain View Lumber Depot',
+          location: 'Cabcab, New Corella, Davao del Norte',
+          permitNumber: 'DENRXI-2A-LD03-R-04102025',
+          dateApproved: 'April 10, 2020',
+          expiryDate: 'April 10, 2025',
+          owner: 'Juan dela Cruz',
+          dataProvider: 'Carmalyn C. Nesperos / RPS-LPU'
+        },
+        {
+          establishment: 'Golden Timber Dealers',
+          location: 'Mesaoy, New Corella, Davao del Norte',
+          permitNumber: 'DENRXI-2A-LD04-R-11052030',
+          dateApproved: 'November 5, 2025',
+          expiryDate: 'November 5, 2030',
+          owner: 'Ana Reyes',
+          dataProvider: 'Carmalyn C. Nesperos / RPS-LPU'
+        },
+        {
+          establishment: 'Pacific Lumber Traders',
+          location: 'San Isidro, New Corella, Davao del Norte',
+          permitNumber: 'DENRXI-2A-LD05-R-09122027',
+          dateApproved: 'September 12, 2022',
+          expiryDate: 'September 12, 2027',
+          owner: 'Carlos Garcia',
+          dataProvider: 'Carmalyn C. Nesperos / RPS-LPU'
+        },
+        {
+          establishment: 'Sunrise Lumber Dealers',
+          location: 'Tagum Road, New Corella, Davao del Norte',
+          permitNumber: 'DENRXI-2A-LD06-R-01152023',
+          dateApproved: 'January 15, 2018',
+          expiryDate: 'January 15, 2023',
+          owner: 'Elena Rodriguez',
+          dataProvider: 'Carmalyn C. Nesperos / RPS-LPU'
+        }
+      ];
+      
+      populateTable();
+      calculateStats();
+      updateDataStatus('Sample data loaded', 'text-blue-600');
+    }
+
+    function updateDataStatus(message, colorClass) {
+      const statusEl = document.getElementById('dataStatus');
+      statusEl.innerHTML = `<i class="fas fa-database mr-1"></i>${message}`;
+      statusEl.className = `text-sm ${colorClass}`;
+    }
+
+    function showEmptyState() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="9" class="px-6 py-12 text-center">
+            <i class="fas fa-inbox text-gray-300 text-4xl mb-4"></i>
+            <p class="text-gray-500">No permit data found in the spreadsheet</p>
+            <button onclick="refreshData()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <i class="fas fa-sync-alt mr-2"></i>Try Again
+            </button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function showErrorState(errorMessage) {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="9" class="px-6 py-12 text-center">
+            <i class="fas fa-exclamation-triangle text-red-300 text-4xl mb-4"></i>
+            <p class="text-gray-500 mb-2">Failed to load data from Google Sheets</p>
+            <p class="text-sm text-gray-400 mb-4">${errorMessage}</p>
+            <button onclick="refreshData()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <i class="fas fa-sync-alt mr-2"></i>Retry Connection
+            </button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function refreshData() {
+      loadDataFromGoogleSheets();
     }
 
     function parseCSVLine(line) {
@@ -536,6 +585,32 @@
       }
     }
 
+    function getCountdownTimer(expiryDate) {
+      if (!expiryDate) return '<span class="text-gray-400">No expiry date</span>';
+      
+      const expiry = new Date(expiryDate);
+      const now = new Date();
+      const timeDiff = expiry.getTime() - now.getTime();
+      
+      if (timeDiff <= 0) {
+        return '<span class="text-red-600 font-semibold">EXPIRED</span>';
+      }
+      
+      const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+      
+      let colorClass = 'text-green-600';
+      if (days < 30) colorClass = 'text-red-600';
+      else if (days < 90) colorClass = 'text-yellow-600';
+      
+      return `<div class="${colorClass} font-mono text-sm">
+        <div class="font-semibold">${days} days</div>
+        <div class="text-xs">${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</div>
+      </div>`;
+    }
+
     function populateTable() {
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
@@ -550,8 +625,8 @@
         tr.innerHTML = `
           <td class="px-6 py-4">
             <div class="flex items-center">
-              <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                <i class="fas fa-building text-green-600"></i>
+              <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mr-3">
+                <i class="fas fa-industry text-amber-600"></i>
               </div>
               <div>
                 <div class="text-sm font-medium text-gray-900">${row.establishment}</div>
@@ -565,6 +640,9 @@
           <td class="px-6 py-4 text-sm text-gray-900">${row.expiryDate}</td>
           <td class="px-6 py-4 text-sm text-gray-900">${row.owner}</td>
           <td class="px-6 py-4 text-sm text-gray-900">${row.dataProvider}</td>
+          <td class="px-6 py-4 countdown-cell" data-expiry="${row.expiryDate}">
+            ${getCountdownTimer(row.expiryDate)}
+          </td>
           <td class="px-6 py-4">
             <span class="${status.class} inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white">
               <i class="fas ${status.status === 'Active' ? 'fa-check-circle' : status.status === 'Expiring Soon' ? 'fa-clock' : 'fa-times-circle'} mr-1"></i>
@@ -603,7 +681,7 @@
       // Update status text
       const activePercentage = total > 0 ? Math.round((active / total) * 100) : 0;
       document.getElementById('totalLicensesChange').innerHTML = `<i class="fas fa-arrow-up"></i> ${activePercentage}% Active`;
-      document.getElementById('activeLicensesText').textContent = expired > 0 ? `${expired} expired licenses` : 'Currently valid';
+      document.getElementById('activeLicensesText').textContent = expired > 0 ? `${expired} expired permits` : 'Currently valid';
     }
 
     function initializeSearch() {
@@ -652,18 +730,19 @@
     }
 
     function exportData() {
-      // Use live data if available, otherwise use sample data
-      const dataToExport = allData.length > 0 ? allData : [
-        {establishment: 'Mylane Mini-Sawmill and Lumber Dealer', location: 'Mesaoy, New Corella, Davao del Norte', permitNumber: 'DENRXI-2A-LD56-R-05032029', dateApproved: '', expiryDate: 'May 3, 2029', owner: 'Liting Hou Qiu', dataProvider: 'Carmalyn C. Nesperos / RPS-LPU'},
-        {establishment: 'New Corella Lumber Supply', location: 'Poblacion, New Corella, Davao del Norte', permitNumber: 'DENRXI-2A-LD57-R-06152028', dateApproved: 'June 15, 2023', expiryDate: 'June 15, 2025', owner: 'Maria Santos', dataProvider: 'Carmalyn C. Nesperos / RPS-LPU'},
-        {establishment: 'Davao Forest Products', location: 'San Roque, New Corella, Davao del Norte', permitNumber: 'DENRXI-2A-LD58-R-12012027', dateApproved: 'December 1, 2022', expiryDate: 'December 1, 2027', owner: 'Juan dela Cruz', dataProvider: 'Carmalyn C. Nesperos / RPS-LPU'},
-        {establishment: 'Mountain View Lumber', location: 'Cabcab, New Corella, Davao del Norte', permitNumber: 'DENRXI-2A-LD59-R-03202030', dateApproved: 'March 20, 2025', expiryDate: 'March 20, 2030', owner: 'Roberto Garcia', dataProvider: 'Carmalyn C. Nesperos / RPS-LPU'},
-        {establishment: 'Golden Timber Trading', location: 'San Isidro, New Corella, Davao del Norte', permitNumber: 'DENRXI-2A-LD60-R-08102023', dateApproved: 'August 10, 2018', expiryDate: 'August 10, 2023', owner: 'Ana Reyes', dataProvider: 'Carmalyn C. Nesperos / RPS-LPU'}
-      ];
+      if (allData.length === 0) {
+        alert('No data available to export. Please load data first.');
+        return;
+      }
 
-      const headers = ['Establishment', 'Location/Address', 'Permit Number', 'Date Approved', 'Expiry Date', 'Owner/Representative', 'Data Provider', 'Status'];
-      const rows = dataToExport.map(row => {
+      const headers = ['Establishment', 'Location/Address', 'Permit Number', 'Date Approved', 'Expiry Date', 'Owner/Representative', 'Data Provider', 'Days Until Expiry', 'Status'];
+      const rows = allData.map(row => {
         const status = getLicenseStatus(row.expiryDate);
+        const expiry = new Date(row.expiryDate);
+        const now = new Date();
+        const timeDiff = expiry.getTime() - now.getTime();
+        const daysUntilExpiry = timeDiff > 0 ? Math.floor(timeDiff / (1000 * 60 * 60 * 24)) : 'EXPIRED';
+        
         return [
           row.establishment,
           row.location,
@@ -672,6 +751,7 @@
           row.expiryDate,
           row.owner,
           row.dataProvider,
+          daysUntilExpiry,
           status.status
         ];
       });
@@ -684,7 +764,7 @@
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'lumber-dealer-permits-' + new Date().toISOString().split('T')[0] + '.csv';
+      a.download = 'lumber-dealer-permits-v13-' + new Date().toISOString().split('T')[0] + '.csv';
       a.click();
       window.URL.revokeObjectURL(url);
     }
@@ -700,15 +780,5 @@
       });
     });
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96a3dbc4e78d3424',t:'MTc1NDM3MTM2NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
-<script>
-  document.addEventListener("contextmenu", e => e.preventDefault());
-  document.onkeydown = function(e) {
-    if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 'I'.charCodeAt(0))) {
-      return false;
-    }
-  };
-</script>
-  
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98a33e2047d4fee5',t:'MTc1OTczMzYxNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
-
